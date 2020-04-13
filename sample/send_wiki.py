@@ -1,11 +1,11 @@
 import config
-import date_convert
-import use_email
-import get_random_wiki
+from furtherpy.sample import date_conv_tool
+from email_reader_repo.sample import email_tool
+import get_wiki
+from spotify_controller_repo.sample import gsheets_tool
+import time
 import requests
 from bs4 import BeautifulSoup
-import sheets
-import time
 
 # Do:
 # make it so you can schedule an article!
@@ -15,10 +15,10 @@ import time
 
 def get_todays_random_wiki():
     # Gets title
-    wiki_title = get_random_wiki.get_random_wiki_title()
+    wiki_title = get_wiki.get_random_wiki_title()
 
     # Gets link
-    wiki_link = get_random_wiki.convert_title_to_link(wiki_title)
+    wiki_link = get_wiki.convert_title_to_link(wiki_title)
 
     return [wiki_title, wiki_link]
 
@@ -47,7 +47,7 @@ def test_wiki_link(wiki_info):
 
     subject = "WIKI LINK TEST for " + wiki_title
 
-    subject_fixed = use_email.fix_text_format_for_email(subject)
+    subject_fixed = email_tool.fix_text_format_for_email(subject)
 
     email_text = "TEST\n\n" + wiki_link[8:]
 
@@ -55,7 +55,7 @@ def test_wiki_link(wiki_info):
     result = 1
 
     try:
-        use_email.send_email(config.test_email_address, config.test_email_password, config.test_email_address,
+        email_tool.send_email(config.test_email_address, config.test_email_password, config.test_email_address,
                              subject_fixed, email_text)
     except UnicodeEncodeError:
         # sets result to show error
@@ -68,10 +68,10 @@ def test_wiki_link(wiki_info):
 
 
 def get_email_list():
-    service = sheets.authenticate_sheets_api()
+    service = gsheets_tool.authenticate_sheets_api()
     current_sheet_id = config.email_send_list_google_sheet_id
 
-    raw_email_list = sheets.get_all_sheets_data(service, current_sheet_id, "A:A")
+    raw_email_list = gsheets_tool.get_all_sheets_data(service, current_sheet_id, "A:A")
 
     email_list = [val for sublist in raw_email_list for val in sublist]
 
@@ -84,16 +84,16 @@ def send_wiki_link(wiki_info):
 
     # Formats email text
     email_text = "Your random Wikipedia article for today!\n\n" + wiki_link[8:]
-    subject = "Wiki of the Day: " + wiki_title + " - " + date_convert.get_readable("day")
+    subject = "Wiki of the Day: " + wiki_title + " - " + date_conv_tool.get_readable("day")
 
-    subject_fixed = use_email.fix_text_format_for_email(subject)
+    subject_fixed = email_tool.fix_text_format_for_email(subject)
 
     # Gets the wiki-a-day email list
     mailing_list = get_email_list()
 
     # Sends email to every address on list
     for send_address in mailing_list:
-        use_email.send_email(config.send_wiki_email_address, config.send_wiki_email_password, send_address,
+        email_tool.send_email(config.send_wiki_email_address, config.send_wiki_email_password, send_address,
                              subject_fixed, email_text)
 
     print("[send_wiki] Sent today's random Wiki: " + wiki_title)
@@ -101,13 +101,13 @@ def send_wiki_link(wiki_info):
 
 # adds email to email list Google Sheet
 def add_email_to_list(new_email_address):
-    service = sheets.authenticate_sheets_api()
+    service = gsheets_tool.authenticate_sheets_api()
     current_sheet_id = config.email_send_list_google_sheet_id
 
     # currently not set up, but has the ability to add name to list
-    sheets.write_data_pair_to_sheet(service, current_sheet_id, "A:B", new_email_address, "")
+    gsheets_tool.write_data_pair_to_sheet(service, current_sheet_id, "A:B", new_email_address, "")
 
-    use_email.send_email(config.send_wiki_email_address, config.send_wiki_email_password, new_email_address,
+    email_tool.send_email(config.send_wiki_email_address, config.send_wiki_email_password, new_email_address,
                          "Success! - Wiki of the Day", "You have been successfully added to the Wiki of the Day!")
 
     print("[send_wiki] Added " + new_email_address + " to email list")

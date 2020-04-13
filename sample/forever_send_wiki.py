@@ -1,5 +1,5 @@
 import send_wiki
-import use_files
+from furtherpy.sample import files_tool
 import time
 
 
@@ -10,7 +10,7 @@ while 1:
 
     except Exception as e:
         # saves error file
-        use_files.basic_write_file("forever_send_wiki_crash_report", "send_wiki crashed with the exception: " + str(e))
+        files_tool.basic_write_file("forever_send_wiki_crash_report", "send_wiki crashed with the exception: " + str(e))
 
         print("\n[forever_send_wiki] The error: '" + str(e) +
               "' occurred while running send_wiki.py.\nTrying again...\n")
@@ -18,7 +18,6 @@ while 1:
         # waits to restart loop
         time.sleep(30)
 
-    # Waits set amount of hours to send news update
-
+    # Waits the set amount of hours to send news update
     hours_wait = 24
     time.sleep(3600 * hours_wait)
