@@ -1,7 +1,7 @@
 import config
 from furtherpy.sample import date_conv_tool
 from email_reader_repo.sample import email_tool
-import get_wiki
+from wiki_of_the_day_repo.sample import get_wiki
 from spotify_controller_repo.sample import gsheets_tool
 import time
 import requests

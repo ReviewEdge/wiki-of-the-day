@@ -1,4 +1,4 @@
-import send_wiki
+from wiki_of_the_day_repo.sample import send_wiki
 from furtherpy.sample import files_tool
 import time
 
